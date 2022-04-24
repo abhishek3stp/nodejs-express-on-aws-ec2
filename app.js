@@ -1,25 +1,38 @@
-const express = require('express');
-const app = express();
-const port = 3000;
+const mongoose = require('mongoose');
+const express = require('express')
+const app = express()
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
-app.get('/', (req, res) => {
-  res.send('<h1>Rupesh ka Demo App</h1> <h4>Message: Suraj Baat ho gai?</h4> <p>Version 1.1</p>');
-})
+const port = 3000
+mongoose.connect('mongodb+srv://SURAJ:suraj@cluster0.pm83k.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+ {useNewUrlParser: true, 
+    useUnifiedTopology: true,
+    useCreateIndex:true
+}).then(()=> {
+    console.log("db commected")
+}).catch((err)=>console.log(err.message));
 
-app.get('/products', (req, res) => {
-  res.send([
-    {
-      productId: '101',
-      price: 100
-    },
-    {
-      productId: '102',
-      price: 150
-    }
-  ])
-})
+//Middlewares
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(cors());
 
-app.listen(port, ()=> {
-  console.log(`Demo app is up and listening to port: ${port}`);
-})
- 
+
+const categoryRoutes = require("./routes/category");
+const orderRoutes = require("./routes/order");
+const subCategoryRoutes = require("./routes/subcategory");
+const productRoutes = require("./routes/product");
+const authRoutes = require("./routes/auth");
+
+app.use("/api", categoryRoutes);
+app.use("/api", orderRoutes);
+app.use("/api",subCategoryRoutes);
+app.use("/api",productRoutes);
+app.use("/api",authRoutes);
+
+app.use('/uploads', express.static('uploads'));
+
+
+app.listen(port, () => console.log(`app listening at http://localhost:${port}`))
